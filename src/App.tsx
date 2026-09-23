@@ -10,9 +10,20 @@ import { getStoredUser, clearGoogleAuth, GoogleAuthUser } from './lib/googleAuth
 import { VideoItem } from './types.ts';
 
 export default function App() {
-  // Simple client-side hash / state router to preserve SPA navigation
-  const [currentPath, setCurrentPath] = useState<string>(() => {
+  // Support both standard paths (/admin) and hash paths (/#/admin)
+  const getCurrentRoute = () => {
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash.startsWith('/')) {
+      return hash;
+    }
+    if (hash.length > 0 && !hash.startsWith('?')) {
+      return '/' + hash;
+    }
     return window.location.pathname || '/';
+  };
+
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    return getCurrentRoute();
   });
 
   const [adminUser, setAdminUser] = useState<GoogleAuthUser | null>(() => {
@@ -21,13 +32,17 @@ export default function App() {
 
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
 
-  // Sync state on popstate
+  // Sync state on popstate and hashchange
   useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname || '/');
+    const handleLocationChange = () => {
+      setCurrentPath(getCurrentRoute());
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
   }, []);
 
   const navigate = (path: string) => {
