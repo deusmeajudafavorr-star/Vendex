@@ -335,17 +335,36 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
           </div>
         ) : videos.length === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-zinc-400 gap-4">
-            <Sparkles className="w-12 h-12 text-rose-500 stroke-[1.5]" />
-            <h3 className="text-lg font-bold text-white">Nenhum produto encontrado</h3>
-            <p className="text-xs text-zinc-400 max-w-xs">
-              Não encontramos vídeos com o filtro selecionado. Tente buscar por outros termos ou limpar a busca.
-            </p>
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold"
-            >
-              Ver todos os vídeos
-            </button>
+            <div className="w-16 h-16 rounded-3xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-rose-500 shadow-xl">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            {selectedTag || searchQuery ? (
+              <>
+                <h3 className="text-lg font-bold text-white">Nenhum produto encontrado</h3>
+                <p className="text-xs text-zinc-400 max-w-xs">
+                  Não encontramos vídeos com o filtro selecionado. Tente buscar por outros termos ou limpar a busca.
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all active:scale-95"
+                >
+                  Ver todos os vídeos
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-bold text-white">Catálogo VendeX Zerado</h3>
+                <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
+                  Nenhum produto cadastrado no momento. Acesse o painel de administração para cadastrar suas primeiras ofertas e vídeos de afiliados.
+                </p>
+                <button
+                  onClick={() => onNavigate('/admin')}
+                  className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white text-xs font-black shadow-lg shadow-rose-950/50 transition-all active:scale-95"
+                >
+                  Cadastrar Primeiro Vídeo
+                </button>
+              </>
+            )}
           </div>
         ) : (
           videos.map((video, idx) => (

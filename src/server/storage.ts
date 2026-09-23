@@ -225,13 +225,5 @@ export async function flushAnalytics(): Promise<void> {
  * Ensure priority demo data exists
  */
 export async function ensurePrioritySeedVideo(): Promise<void> {
-  const { data } = await getDriveDatabase();
-  const hasPriorityVideo = data.videos.some(v => v.id === 'video_007');
-  if (!hasPriorityVideo) {
-    const priorityVideo = INITIAL_DATABASE.videos.find(v => v.id === 'video_007');
-    if (priorityVideo) {
-      data.videos.unshift(priorityVideo);
-      await saveDriveDatabase(data);
-    }
-  }
+  // Empty seed - user requested zero test products
 }

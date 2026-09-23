@@ -677,8 +677,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </tr>
                 ) : videos.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-zinc-500">
-                      Nenhum vídeo cadastrado com os critérios selecionados.
+                    <td colSpan={9} className="py-16 text-center">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-rose-400">
+                          <Video className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-white">
+                          {search || filter !== 'all'
+                            ? 'Nenhum vídeo encontrado com esses filtros'
+                            : 'Catálogo de Vídeos Zerado'}
+                        </h4>
+                        <p className="text-xs text-zinc-400 max-w-xs">
+                          {search || filter !== 'all'
+                            ? 'Tente alterar os termos de busca ou remover os filtros aplicados.'
+                            : 'O banco de dados no Firebase está limpo e pronto para você cadastrar seus vídeos e links de afiliado.'}
+                        </p>
+                        <button
+                          onClick={() => onNavigate('/admin/videos/novo')}
+                          className="mt-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-rose-950/40 active:scale-95 transition-all"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Adicionar Primeiro Vídeo</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ) : (
