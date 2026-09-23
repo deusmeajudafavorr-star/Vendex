@@ -215,11 +215,11 @@ export const VideoCard: React.FC<VideoCardProps> = ({
     for (let i = 0; i < source.length; i++) {
       hash = (hash * 31 + source.charCodeAt(i)) | 0;
     }
-    return 72 + Math.abs(hash) % 27;
+    return 90 + Math.abs(hash) % 10;
   };
 
   const viralPotential = getViralPotential();
-  const standardDescription = `Atenção: para pegar mais informação do produto, como nome e detalhes, clique em Ver produto. 🚀 Potencial de viralização: ${viralPotential}% — compartilhe e descubra se esse vídeo vai bombar!`;
+  const standardDescription = `Atenção: para pegar mais informação do produto, como nome e detalhes, clique em Ver produto. 🚀 Potencial de viralização: ${viralPotential}% — oferta feita para chamar atenção, gerar curiosidade e ter grande alcance quando compartilhada!`;
 
   const handleProductClick = () => {
     sendAnalytics(video.id, 'click');
@@ -452,10 +452,21 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         {(video.title || (!video.priority_release && video.price)) && (
           <div>
             {video.title && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-start gap-2 flex-wrap">
                 <h2 className="text-base sm:text-lg font-bold line-clamp-2 leading-snug drop-shadow-lg text-white">
                   {video.title}
                 </h2>
+                <span className="shrink-0 px-2 py-1 rounded-full bg-gradient-to-r from-rose-600 via-orange-500 to-amber-400 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-tight shadow-lg shadow-orange-950/50 border border-white/20 animate-pulse">
+                  🔥 {viralPotential}% VIRAL
+                </span>
+              </div>
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-200 text-[9px] font-black uppercase">
+                  🚀 Altíssima chance de bombar
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-[9px] font-bold">
+                  👀 Oferta que chama atenção
+                </span>
               </div>
             )}
             {!video.priority_release && video.price && (
