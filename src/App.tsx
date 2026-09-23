@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Feed } from './components/Feed.tsx';
 import { Simulator } from './components/Simulator.tsx';
 import { UserProfile } from './components/UserProfile.tsx';
@@ -147,5 +148,10 @@ export default function App() {
   }
 
   // Default Route: / (TikTok / Reels / Shorts style vertical feed)
-  return <Feed onNavigate={navigate} />;
+  return (
+    <>
+      <Feed onNavigate={navigate} />
+      <Analytics />
+    </>
+  );
 }
