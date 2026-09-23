@@ -213,7 +213,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
   };
 
   const viralPotential = getViralPotential();
-  const standardDescription = `Atenção: para pegar mais informação do produto, como nome e detalhes, clique em Ver produto. 🚀 Potencial de viralização: ${viralPotential}% — oferta feita para chamar atenção, gerar curiosidade e ter grande alcance quando compartilhada!`;
+  const standardDescription = `Atenção: para pegar mais informação do produto, como nome e detalhes, clique em Ver informações do produto. 🚀 Potencial de viralização: ${viralPotential}% — oferta feita para chamar atenção, gerar curiosidade e ter grande alcance quando compartilhada!`;
 
   const handleProductClick = () => {
     sendAnalytics(video.id, 'click');
@@ -375,7 +375,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 max-w-md">
           <button onClick={handleProductClick} className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-bold text-sm shadow-xl shadow-rose-950/50 flex items-center justify-center gap-2 active:scale-98 transition-all duration-200 border border-white/15">
             <ShoppingBag className="w-4 h-4 stroke-[2.5]" />
-            <span>Ver produto</span>
+            <span>Ver informações do produto</span>
             <ExternalLink className="w-3.5 h-3.5 opacity-80" />
           </button>
 
