@@ -143,7 +143,7 @@ export async function createVideoInFirebase(videoData: Partial<VideoItem>): Prom
     id,
     video_url: videoData.video_url || '',
     download_url: videoData.download_url || videoData.video_url || '',
-    product_url: videoData.product_url || '',
+    product_url: videoData.affiliate_url || videoData.product_url || '',
     affiliate_url: videoData.affiliate_url || videoData.product_url || '',
     title: videoData.title || 'Produto VendeX',
     description: videoData.description || '',
@@ -236,13 +236,14 @@ export async function importBatchInFirebase(items: any[]): Promise<{ importedCou
 
   let count = 0;
   for (const item of items) {
-    if (!item.video_url || !item.product_url) continue;
+    const affiliate = item.affiliate_url || item.product_url;
+    if (!item.video_url || !affiliate) continue;
     const newVideo: VideoItem = {
       id: `video_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
       video_url: item.video_url,
       download_url: item.download_url || item.video_url,
-      product_url: item.product_url,
-      affiliate_url: item.affiliate_url || item.product_url,
+      product_url: affiliate,
+      affiliate_url: affiliate,
       title: item.title || 'Produto Importado',
       description: item.description || '',
       thumbnail_url: item.thumbnail_url || undefined,

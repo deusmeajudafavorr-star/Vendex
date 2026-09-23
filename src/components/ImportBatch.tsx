@@ -27,14 +27,13 @@ export const ImportBatch: React.FC<ImportBatchProps> = ({
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const sampleCsv = `video_url,download_url,product_url,affiliate_url,title,description,thumbnail_url,allow_download,position,active,tags,price,discount
-https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4,,https://shopee.com.br/produto1,https://s.shopee.com.br/afiliado1,Teclado Mecânico RGB Gamer,Teclado mecânico switch azul com led rainbow,https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600,true,7,true,"Gamer, Teclado, Tech",R$ 139,90,-30%`;
+  const sampleCsv = `video_url,download_url,affiliate_url,title,description,thumbnail_url,allow_download,position,active,tags,price,discount
+https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4,,https://s.shopee.com.br/afiliado1,Teclado Mecânico RGB Gamer,Teclado mecânico switch azul com led rainbow,https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600,true,7,true,"Gamer, Teclado, Tech",R$ 139,90,-30%`;
 
   const sampleJson = `[
   {
     "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     "download_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    "product_url": "https://shopee.com.br/mouse-gamer-sem-fio",
     "affiliate_url": "https://s.shopee.com.br/mouse_afiliado",
     "title": "Mouse Gamer Sem Fio Recarregável 3200 DPI",
     "description": "Sensor de alta precisão, iluminação RGB e clique silencioso.",
@@ -275,10 +274,7 @@ https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlaze
               <code>title</code>: Nome do produto (Obrigatório)
             </li>
             <li>
-              <code>product_url</code>: Link original do produto
-            </li>
-            <li>
-              <code>affiliate_url</code>: Link de comissão do afiliado
+              <code>affiliate_url</code>: Link de afiliado / botão de compra (Obrigatório)
             </li>
             <li>
               <code>download_url</code>: Link do MP4 para download

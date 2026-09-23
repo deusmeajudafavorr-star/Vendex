@@ -35,8 +35,9 @@ export const VideoForm: React.FC<VideoFormProps> = ({
 
   const [videoUrl, setVideoUrl] = useState(initialVideo?.video_url || '');
   const [downloadUrl, setDownloadUrl] = useState(initialVideo?.download_url || '');
-  const [productUrl, setProductUrl] = useState(initialVideo?.product_url || '');
-  const [affiliateUrl, setAffiliateUrl] = useState(initialVideo?.affiliate_url || '');
+  const [affiliateUrl, setAffiliateUrl] = useState(
+    initialVideo?.affiliate_url || initialVideo?.product_url || ''
+  );
   const [title, setTitle] = useState(initialVideo?.title || '');
   const [description, setDescription] = useState(initialVideo?.description || '');
   const [thumbnailUrl, setThumbnailUrl] = useState(initialVideo?.thumbnail_url || '');
@@ -67,12 +68,12 @@ export const VideoForm: React.FC<VideoFormProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const [productIframeFailed, setProductIframeFailed] = useState(false);
 
-  // Auto scrape product preview when productUrl changes and title is empty
+  // Auto scrape product preview when affiliateUrl changes and title is empty
   const handleScrapeProduct = async () => {
-    if (!productUrl) return;
+    if (!affiliateUrl) return;
     setScraping(true);
     try {
-      const data = await scrapeProductPreview(productUrl);
+      const data = await scrapeProductPreview(affiliateUrl);
       if (data.title && !title) setTitle(data.title);
       if (data.description && !description) setDescription(data.description);
       if (data.image && !thumbnailUrl) setThumbnailUrl(data.image);
@@ -97,6 +98,11 @@ export const VideoForm: React.FC<VideoFormProps> = ({
       return;
     }
 
+    if (!affiliateUrl.trim()) {
+      setError('O link de afiliado é obrigatório.');
+      return;
+    }
+
     const tagsArray = tagsInput
       .split(',')
       .map((t) => t.trim())
@@ -105,8 +111,8 @@ export const VideoForm: React.FC<VideoFormProps> = ({
     const payload: Partial<VideoItem> = {
       video_url: videoUrl.trim(),
       download_url: downloadUrl.trim() || videoUrl.trim(),
-      product_url: productUrl.trim(),
-      affiliate_url: affiliateUrl.trim() || productUrl.trim(),
+      product_url: affiliateUrl.trim(),
+      affiliate_url: affiliateUrl.trim(),
       title: title.trim(),
       description: description.trim(),
       thumbnail_url: thumbnailUrl.trim(),
@@ -267,22 +273,22 @@ export const VideoForm: React.FC<VideoFormProps> = ({
             </div>
           </div>
 
-          {/* Card: Product Links & Affiliate */}
+          {/* Card: Affiliate Link */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col gap-4 shadow-xl">
             <div className="flex items-center gap-2 text-amber-400 font-bold text-sm border-b border-zinc-800 pb-3">
               <ShoppingBag className="w-4 h-4" />
-              <span>2. Links de Produto & Afiliado</span>
+              <span>2. Link de Afiliado</span>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-zinc-300">
-                  Link Original do Produto
+                  Link de Afiliado (Botão de Compra / Ver Oferta) *
                 </label>
                 <button
                   type="button"
                   onClick={handleScrapeProduct}
-                  disabled={!productUrl || scraping}
+                  disabled={!affiliateUrl || scraping}
                   className="text-[11px] text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1 disabled:opacity-40"
                 >
                   <Sparkles className="w-3 h-3" />
@@ -291,26 +297,13 @@ export const VideoForm: React.FC<VideoFormProps> = ({
               </div>
               <input
                 type="url"
-                value={productUrl}
-                onChange={(e) => setProductUrl(e.target.value)}
-                placeholder="https://shopee.com.br/produto-exemplo"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Link de Afiliado (Utilizado no botão de compra) *
-              </label>
-              <input
-                type="url"
                 value={affiliateUrl}
                 onChange={(e) => setAffiliateUrl(e.target.value)}
-                placeholder="https://s.shopee.com.br/SEU_CODIGO_AFILIADO"
+                placeholder="https://s.shopee.com.br/SEU_CODIGO ou https://mercadolivre.com/sec/..."
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
               />
               <p className="text-[11px] text-zinc-500 mt-1">
-                Nunca misturamos o link original com seu link de afiliado. As comissões são 100% suas.
+                Insira o seu link de afiliado. Todas as comissões e compras feitas pelos usuários irão diretamente para a sua conta de afiliado.
               </p>
             </div>
           </div>
@@ -569,37 +562,22 @@ export const VideoForm: React.FC<VideoFormProps> = ({
               </div>
             </div>
 
-            {/* External Product Iframe preview fallback */}
-            {productUrl && (
-              <div className="w-full mt-4 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 flex flex-col gap-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-zinc-300 flex items-center gap-1.5">
-                    <LinkIcon className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Página Original do Produto</span>
-                  </span>
-                  <a
-                    href={productUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-amber-400 hover:text-amber-300 flex items-center gap-1 text-[11px]"
-                  >
-                    <span>Abrir produto</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-
-                {!productIframeFailed ? (
-                  <iframe
-                    src={productUrl}
-                    onError={() => setProductIframeFailed(true)}
-                    className="w-full h-32 rounded-xl border border-zinc-800 bg-white"
-                    title="Preview do produto"
-                  />
-                ) : (
-                  <div className="py-4 text-center text-xs text-zinc-500 bg-zinc-950 rounded-xl">
-                    Preview não disponível por restrições do site (X-Frame-Options/CSP). Use o link acima para abrir.
-                  </div>
-                )}
+            {/* Affiliate Link Preview */}
+            {affiliateUrl && (
+              <div className="w-full mt-4 bg-zinc-900 border border-zinc-800 rounded-2xl p-3 flex items-center justify-between text-xs">
+                <span className="font-semibold text-zinc-300 flex items-center gap-1.5">
+                  <LinkIcon className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Link de Afiliado</span>
+                </span>
+                <a
+                  href={affiliateUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-amber-400 hover:text-amber-300 flex items-center gap-1 text-[11px] font-semibold"
+                >
+                  <span>Testar link</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             )}
           </div>

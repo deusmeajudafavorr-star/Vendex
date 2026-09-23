@@ -725,17 +725,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <ExternalLink className="w-2.5 h-2.5" />
                               </a>
                             )}
-                            {video.product_url && (
-                              <a
-                                href={video.product_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-zinc-400 hover:underline flex items-center gap-1"
-                              >
-                                <span>Original</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </a>
-                            )}
                           </div>
                         </td>
 
