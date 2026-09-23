@@ -59,13 +59,41 @@ export async function getFirebaseData(): Promise<DatabaseSchema> {
 }
 
 /**
+ * Recursively remove any undefined properties to satisfy Firebase Realtime Database
+ */
+export function sanitizeForFirebase<T>(val: T): T {
+  if (val === undefined) {
+    return '' as unknown as T;
+  }
+  if (val === null) {
+    return null as unknown as T;
+  }
+  if (Array.isArray(val)) {
+    return val
+      .filter((item) => item !== undefined)
+      .map((item) => sanitizeForFirebase(item)) as unknown as T;
+  }
+  if (typeof val === 'object') {
+    const res: Record<string, any> = {};
+    for (const [k, v] of Object.entries(val as Record<string, any>)) {
+      if (v !== undefined) {
+        res[k] = sanitizeForFirebase(v);
+      }
+    }
+    return res as unknown as T;
+  }
+  return val;
+}
+
+/**
  * Save entire database to Firebase Realtime Database
  */
 export async function saveFirebaseData(data: DatabaseSchema): Promise<void> {
   data.settings.updated_at = new Date().toISOString();
   data.settings.version = (data.settings.version || 1) + 1;
+  const cleanData = sanitizeForFirebase(data);
   const dbRef = ref(rtdb, DB_NODE);
-  await set(dbRef, data);
+  await set(dbRef, cleanData);
 }
 
 /**
