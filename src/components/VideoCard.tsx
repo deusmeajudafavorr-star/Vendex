@@ -209,6 +209,18 @@ export const VideoCard: React.FC<VideoCardProps> = ({
     );
     setTimeout(() => setDownloadStatus(null), 5000);
   };
+  const getViralPotential = () => {
+    const source = `${video.id || video.title || "vendex"}`;
+    let hash = 0;
+    for (let i = 0; i < source.length; i++) {
+      hash = (hash * 31 + source.charCodeAt(i)) | 0;
+    }
+    return 72 + Math.abs(hash) % 27;
+  };
+
+  const viralPotential = getViralPotential();
+  const standardDescription = `Atenção: para pegar mais informação do produto, como nome e detalhes, clique em Ver produto. 🚀 Potencial de viralização: ${viralPotential}% — compartilhe e descubra se esse vídeo vai bombar!`;
+
   const handleProductClick = () => {
     sendAnalytics(video.id, 'click');
     const url = video.affiliate_url || video.product_url;
@@ -462,11 +474,9 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         )}
 
         {/* Description */}
-        {video.description && (
-          <p className="text-xs text-zinc-300 line-clamp-2 leading-relaxed drop-shadow max-w-[95%]">
-            {video.description}
-          </p>
-        )}
+        <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed drop-shadow max-w-[95%]">
+          {standardDescription}
+        </p>
 
         {/* Action Buttons: Ver Produto & Baixar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1 max-w-md">
