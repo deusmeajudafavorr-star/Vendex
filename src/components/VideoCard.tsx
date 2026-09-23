@@ -484,10 +484,14 @@ export const VideoCard: React.FC<VideoCardProps> = ({
           {video.allow_download && (
             <button
               onClick={handleDownload}
-              className="py-3 px-4 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200 hover:text-white font-semibold text-xs backdrop-blur-md border border-white/10 flex items-center justify-center gap-1.5 active:scale-98 transition-all"
+              className="group relative py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-700 hover:from-emerald-300 hover:via-green-400 hover:to-emerald-600 text-white font-black text-xs backdrop-blur-md border border-emerald-200/70 flex items-center justify-center gap-1.5 active:scale-95 transition-all duration-200 shadow-xl shadow-emerald-950/70 ring-2 ring-emerald-300/50 animate-pulse overflow-hidden"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>{downloadStatus || 'Baixar vídeo'}</span>
+              <span className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <Download className="relative w-4 h-4 stroke-[2.5]" />
+              <span className="relative">{downloadStatus || 'BAIXAR VÍDEO'}</span>
+              {!downloadStatus && (
+                <span className="relative ml-0.5 w-2 h-2 rounded-full bg-yellow-300 shadow-[0_0_8px_rgba(253,224,71,0.9)]" />
+              )}
             </button>
           )}
         </div>
