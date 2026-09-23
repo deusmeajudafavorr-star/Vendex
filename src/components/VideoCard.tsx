@@ -143,53 +143,72 @@ export const VideoCard: React.FC<VideoCardProps> = ({
     sendAnalytics(video.id, 'download');
     setDownloadStatus('Preparando vídeo...');
 
+    const targetUrl = (video.download_url || video.video_url || '').trim();
+    if (!targetUrl) {
+      setDownloadStatus('Vídeo indisponível');
+      setTimeout(() => setDownloadStatus(null), 3000);
+      return;
+    }
+
+    const cleanTitle = video.title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\\u0300-\\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+    const filename = (cleanTitle || 'vendex-video') + '.mp4';
+
+    // Mobile browsers often block cross-origin fetch() because of CORS.
+    // Try a Blob download first, then fall back to opening the real MP4 URL.
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
     try {
-      const targetUrl = video.download_url || video.video_url;
-      // Sanitize filename
-      const cleanTitle = video.title
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
-      const filename = `${cleanTitle || 'vendex-video'}.mp4`;
+      const response = await fetch(targetUrl, {
+        mode: 'cors',
+        credentials: 'omit',
+      });
 
-      // Try fetching blob for seamless direct download naming
-      const response = await fetch(targetUrl);
-      if (!response.ok) throw new Error('Download direct fetch failed');
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+
       const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
+      if (!blob.size) throw new Error('Empty video');
 
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = filename;
+      link.rel = 'noopener';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+      link.remove();
+
+      // Keep the blob alive long enough for mobile browsers to start saving it.
+      window.setTimeout(() => window.URL.revokeObjectURL(blobUrl), 30000);
 
       setDownloadStatus('Download iniciado!');
       setTimeout(() => setDownloadStatus(null), 3000);
-    } catch {
-      // Fallback: standard link download
-      const targetUrl = video.download_url || video.video_url;
-      const cleanTitle = video.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]/gi, '-')
-        .replace(/-+/g, '-');
-      const link = document.createElement('a');
-      link.href = targetUrl;
-      link.download = `${cleanTitle}.mp4`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setDownloadStatus('Download iniciado!');
-      setTimeout(() => setDownloadStatus(null), 3000);
+      return;
+    } catch (error) {
+      console.warn('[VendeX download] Blob download unavailable:', error);
     }
-  };
 
+    // Cross-origin MP4 fallback. The native browser media viewer can save it.
+    const link = document.createElement('a');
+    link.href = targetUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    if (!isMobile) link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setDownloadStatus(
+      isMobile
+        ? 'Vídeo aberto. Toque em ⋮ e escolha Baixar/Salvar vídeo.'
+        : 'Download iniciado!'
+    );
+    setTimeout(() => setDownloadStatus(null), 5000);
+  };
   const handleProductClick = () => {
     sendAnalytics(video.id, 'click');
     const url = video.affiliate_url || video.product_url;
