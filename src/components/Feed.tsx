@@ -8,8 +8,6 @@ import {
   VolumeX,
   RefreshCw,
   Compass,
-  DollarSign,
-  ShieldCheck,
   User,
   X
 } from 'lucide-react';
@@ -46,7 +44,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
   const [showSearchModal, setShowSearchModal] = useState<boolean>(false);
   const [sourceInfo, setSourceInfo] = useState<string>('carregando...');
 
-  // Priority Access & Modal States
   const [userProfile, setUserProfile] = useState<UserPriorityProfile | null>(null);
   const [freshModalVideo, setFreshModalVideo] = useState<VideoItem | null>(null);
   const [showFreshNotification, setShowFreshNotification] = useState<boolean>(false);
@@ -54,14 +51,12 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Check priority status helper
   const isPriorityUser = Boolean(
     userProfile?.priority_active &&
     userProfile?.priority_until &&
     new Date(userProfile.priority_until).getTime() > Date.now()
   );
 
-  // Initial load
   const loadVideos = useCallback(
     async (pageNum: number, reset = false, tag = selectedTag, search = searchQuery, priorityOverride?: boolean) => {
       if (reset) {
@@ -104,7 +99,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
     [selectedTag, searchQuery, isPriorityUser]
   );
 
-  // Mount initialization: track referrals, fetch user profile, check onboarding
   useEffect(() => {
     trackReferralVisit();
 
@@ -121,8 +115,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
     return () => unsubscribe();
   }, []);
 
-  // Check and trigger discreet fresh video notification while scrolling videos:
-  // Frequency cap: max 2x a day, at least 20 min interval between appearances
   useEffect(() => {
     if (activeIndex >= 1 && !hasTriggeredNotificationRef.current && !isPriorityUser) {
       if (canShowFreshNotification()) {
@@ -133,7 +125,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
     }
   }, [activeIndex, isPriorityUser]);
 
-  // Handle URL referral or deep linked video (/v/:id or ?v=:id)
   useEffect(() => {
     if (videos.length === 0) return;
     const urlParams = new URLSearchParams(window.location.search);
@@ -147,7 +138,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
     }
   }, [videos]);
 
-  // IntersectionObserver to detect strictly visible video for auto-play and paging
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -178,14 +168,12 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
     };
   }, [videos, activeIndex]);
 
-  // Infinite scroll trigger when reaching near the end (index >= length - 2)
   useEffect(() => {
     if (activeIndex >= videos.length - 2 && hasMore && !loadingMore && !loading) {
       loadVideos(page + 1, false);
     }
   }, [activeIndex, videos.length, hasMore, loadingMore, loading, page, loadVideos]);
 
-  // Keyboard navigation on desktop (ArrowUp, ArrowDown)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['ArrowDown', 'PageDown', 'j', 'J'].includes(e.key)) {
@@ -232,9 +220,7 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
 
   return (
     <div className="relative w-full h-[100dvh] bg-zinc-950 overflow-hidden flex flex-col items-center">
-      {/* Top Header / Branding Bar */}
       <header className="absolute top-0 left-0 right-0 z-40 px-4 py-3 flex items-center justify-between pointer-events-none">
-        {/* Brand & Slogan */}
         <div className="flex items-center gap-2 pointer-events-auto">
           <button
             onClick={() => {
@@ -262,16 +248,13 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
           </button>
         </div>
 
-        {/* Top Right Quick Actions */}
         <div className="flex items-center gap-2 pointer-events-auto">
-          {/* Priority Status Badge */}
           <PriorityHeaderBadge
             userProfile={userProfile}
             onNavigateToProfile={() => onNavigate('/perfil')}
             onOpenFreshModal={() => setFreshModalVideo(videos[activeIndex] || videos[0])}
           />
 
-          {/* Tag / Search toggle */}
           <button
             onClick={() => setShowSearchModal(true)}
             className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 backdrop-blur-md border border-white/10 transition-colors"
@@ -280,7 +263,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
             <Search className="w-4 h-4" />
           </button>
 
-          {/* Profile link */}
           <button
             onClick={() => onNavigate('/perfil')}
             className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 backdrop-blur-md border border-white/10 transition-colors"
@@ -288,29 +270,9 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
           >
             <User className="w-4 h-4" />
           </button>
-
-          {/* Simulator link */}
-          <button
-            onClick={() => onNavigate('/comece')}
-            className="px-2.5 py-1.5 rounded-full bg-zinc-900/70 hover:bg-zinc-800 text-amber-400 text-xs font-semibold backdrop-blur-md border border-amber-500/20 flex items-center gap-1 transition-colors"
-            title="Simulador de Ganhos VendeX"
-          >
-            <DollarSign className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Ganhar</span>
-          </button>
-
-          {/* Admin link */}
-          <button
-            onClick={() => onNavigate('/admin')}
-            className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 text-zinc-300 backdrop-blur-md border border-white/10 transition-colors"
-            title="Painel Administrativo"
-          >
-            <ShieldCheck className="w-4 h-4" />
-          </button>
         </div>
       </header>
 
-      {/* Filter / Active Tag Pill Banner */}
       {(selectedTag || searchQuery) && (
         <div className="absolute top-14 z-40 flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs backdrop-blur-md shadow-lg animate-fade-in">
           <span>
@@ -322,7 +284,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Main Vertical Feed Container */}
       <div
         ref={containerRef}
         className="w-full max-w-md h-[100dvh] overflow-y-scroll snap-y snap-mandatory scroll-smooth no-scrollbar relative shadow-2xl bg-black"
@@ -396,7 +357,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
         )}
       </div>
 
-      {/* Floating Fresh Video Notification Capsule (Appears while scrolling, max 2x/day, 20min interval) */}
       {showFreshNotification && videos[activeIndex] && (
         <FreshVideoBanner
           video={videos[activeIndex]}
@@ -407,7 +367,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
         />
       )}
 
-      {/* Desktop Up/Down Scroll Floating Buttons */}
       <div className="hidden md:flex fixed right-8 bottom-12 flex-col gap-2 z-40">
         <button
           onClick={() => scrollToIndex(activeIndex - 1)}
@@ -427,7 +386,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
         </button>
       </div>
 
-      {/* Search / Tag Filter Modal */}
       {showSearchModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-4 text-white">
@@ -444,7 +402,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
               </button>
             </div>
 
-            {/* Search Input Form */}
             <form onSubmit={handleSearchSubmit} className="relative">
               <input
                 type="text"
@@ -457,7 +414,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
               <Search className="w-5 h-5 text-zinc-500 absolute left-3.5 top-3.5" />
             </form>
 
-            {/* Popular tags */}
             {availableTags.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-zinc-400 mb-2">Tags Populares:</p>
@@ -502,7 +458,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Fresh Video Share / Unlock Modal */}
       {freshModalVideo && (
         <FreshVideoModal
           video={freshModalVideo}
@@ -517,7 +472,6 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
               new Date(updatedProfile.priority_until).getTime() > Date.now()
             );
             if (priActive) {
-              // Reload feed videos with unlocked status
               loadVideos(1, true, selectedTag, searchQuery, true);
             }
           }}
