@@ -60,29 +60,40 @@ export default function App() {
   // Route: /perfil (User profile & daily mission streak)
   if (currentPath === '/perfil') {
     return (
-      <UserProfile
-        onBackToFeed={() => navigate('/')}
-        onSelectVideoToWatch={(videoId) => navigate(`/?v=${videoId}`)}
-        onNavigate={navigate}
-      />
+      <>
+        <UserProfile
+          onBackToFeed={() => navigate('/')}
+          onSelectVideoToWatch={(videoId) => navigate(`/?v=${videoId}`)}
+          onNavigate={navigate}
+        />
+        <Analytics />
+      </>
     );
   }
 
   // Route: /comece (Earnings simulator and presentation)
   if (currentPath === '/comece') {
-    return <Simulator onNavigate={navigate} />;
+    return (
+      <>
+        <Simulator onNavigate={navigate} />
+        <Analytics />
+      </>
+    );
   }
 
   // Route: /admin/login
   if (currentPath === '/admin/login') {
     return (
-      <AdminLogin
-        onLoginSuccess={(user) => {
-          setAdminUser(user);
-          navigate('/admin');
-        }}
-        onNavigate={navigate}
-      />
+      <>
+        <AdminLogin
+          onLoginSuccess={(user) => {
+            setAdminUser(user);
+            navigate('/admin');
+          }}
+          onNavigate={navigate}
+        />
+        <Analytics />
+      </>
     );
   }
 
@@ -90,60 +101,75 @@ export default function App() {
   if (currentPath.startsWith('/admin')) {
     if (!adminUser) {
       return (
-        <AdminLogin
-          onLoginSuccess={(user) => {
-            setAdminUser(user);
-            navigate(currentPath === '/admin/login' ? '/admin' : currentPath);
-          }}
-          onNavigate={navigate}
-        />
+        <>
+          <AdminLogin
+            onLoginSuccess={(user) => {
+              setAdminUser(user);
+              navigate(currentPath === '/admin/login' ? '/admin' : currentPath);
+            }}
+            onNavigate={navigate}
+          />
+          <Analytics />
+        </>
       );
     }
 
     // Sub-route: /admin/videos/novo
     if (currentPath === '/admin/videos/novo') {
       return (
-        <VideoForm
-          initialVideo={null}
-          onNavigate={navigate}
-          onSaved={() => {}}
-        />
+        <>
+          <VideoForm
+            initialVideo={null}
+            onNavigate={navigate}
+            onSaved={() => {}}
+          />
+          <Analytics />
+        </>
       );
     }
 
     // Sub-route: /admin/videos/:id (Edit)
     if (currentPath.startsWith('/admin/videos/') && currentPath !== '/admin/videos') {
       return (
-        <VideoForm
-          initialVideo={editingVideo}
-          onNavigate={navigate}
-          onSaved={() => {}}
-        />
+        <>
+          <VideoForm
+            initialVideo={editingVideo}
+            onNavigate={navigate}
+            onSaved={() => {}}
+          />
+          <Analytics />
+        </>
       );
     }
 
     // Sub-route: /admin/importar
     if (currentPath === '/admin/importar') {
       return (
-        <ImportBatch
-          onNavigate={navigate}
-          onImportComplete={() => {}}
-        />
+        <>
+          <ImportBatch
+            onNavigate={navigate}
+            onImportComplete={() => {}}
+          />
+          <Analytics />
+        </>
       );
     }
 
     // Route: /admin or /admin/videos
     return (
-      <AdminDashboard
-        user={adminUser}
-        onNavigate={navigate}
-        onSelectEditVideo={(video) => setEditingVideo(video)}
-        onLogout={() => {
-          localStorage.removeItem('vendex_admin_user');
-          setAdminUser(null);
-          navigate('/');
-        }}
-      />
+      <>
+        <AdminDashboard
+          user={adminUser}
+          onNavigate={navigate}
+          onSelectEditVideo={(video) => setEditingVideo(video)}
+          onLogout={() => {
+            localStorage.removeItem('vendex_admin_user');
+            setAdminUser(null);
+            navigate('/');
+          }}
+        />
+        <Analytics />
+      </>
     );
   }
 
