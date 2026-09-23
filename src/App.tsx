@@ -42,6 +42,7 @@ export default function App() {
       <UserProfile
         onBackToFeed={() => navigate('/')}
         onSelectVideoToWatch={(videoId) => navigate(`/?v=${videoId}`)}
+        onNavigate={navigate}
       />
     );
   }

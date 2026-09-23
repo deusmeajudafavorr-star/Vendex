@@ -11,7 +11,8 @@ import {
   TrendingUp,
   Award,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 import { UserPriorityProfile, VideoItem } from '../types.ts';
 import {
@@ -23,11 +24,13 @@ import {
 interface UserProfileProps {
   onBackToFeed: () => void;
   onSelectVideoToWatch?: (videoId: string) => void;
+  onNavigate?: (path: string) => void;
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({
   onBackToFeed,
   onSelectVideoToWatch,
+  onNavigate,
 }) => {
   const [profile, setProfile] = useState<UserPriorityProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -317,6 +320,19 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Admin Access Footer */}
+        {onNavigate && (
+          <div className="pt-4 border-t border-zinc-900 flex justify-center pb-6">
+            <button
+              onClick={() => onNavigate('/admin')}
+              className="px-4 py-2 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium border border-zinc-800 flex items-center gap-2 transition-all active:scale-95"
+            >
+              <Shield className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Acessar Painel de Administração</span>
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );
