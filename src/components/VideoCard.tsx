@@ -416,25 +416,29 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         )}
 
         {/* Title and Price */}
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base sm:text-lg font-bold line-clamp-2 leading-snug drop-shadow-lg text-white">
-              {video.title}
-            </h2>
-          </div>
-          {!video.priority_release && video.price && (
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-emerald-400 font-extrabold text-base tracking-tight drop-shadow">
-                {video.price}
-              </span>
-              {video.discount && (
-                <span className="text-[11px] font-bold bg-rose-600/90 text-white px-1.5 py-0.5 rounded-md">
-                  {video.discount}
+        {(video.title || (!video.priority_release && video.price)) && (
+          <div>
+            {video.title && (
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold line-clamp-2 leading-snug drop-shadow-lg text-white">
+                  {video.title}
+                </h2>
+              </div>
+            )}
+            {!video.priority_release && video.price && (
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-emerald-400 font-extrabold text-base tracking-tight drop-shadow">
+                  {video.price}
                 </span>
-              )}
-            </div>
-          )}
-        </div>
+                {video.discount && (
+                  <span className="text-[11px] font-bold bg-rose-600/90 text-white px-1.5 py-0.5 rounded-md">
+                    {video.discount}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Description */}
         {video.description && (

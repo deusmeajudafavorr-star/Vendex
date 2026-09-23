@@ -93,11 +93,6 @@ export const VideoForm: React.FC<VideoFormProps> = ({
       return;
     }
 
-    if (!title.trim()) {
-      setError('O título do produto é obrigatório.');
-      return;
-    }
-
     if (!affiliateUrl.trim()) {
       setError('O link de afiliado é obrigatório.');
       return;
@@ -281,20 +276,9 @@ export const VideoForm: React.FC<VideoFormProps> = ({
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold text-zinc-300">
-                  Link de Afiliado (Botão de Compra / Ver Oferta) *
-                </label>
-                <button
-                  type="button"
-                  onClick={handleScrapeProduct}
-                  disabled={!affiliateUrl || scraping}
-                  className="text-[11px] text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1 disabled:opacity-40"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  <span>{scraping ? 'Extraindo dados...' : 'Buscar título e imagem'}</span>
-                </button>
-              </div>
+              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                Link de Afiliado (Botão de Compra / Ver Oferta) *
+              </label>
               <input
                 type="url"
                 value={affiliateUrl}
@@ -308,154 +292,156 @@ export const VideoForm: React.FC<VideoFormProps> = ({
             </div>
           </div>
 
-          {/* Card: Details, Position & Tags */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col gap-4 shadow-xl">
-            <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm border-b border-zinc-800 pb-3">
-              <Tag className="w-4 h-4" />
-              <span>3. Informações do Produto & Exibição</span>
-            </div>
+          {/* Card: Details, Position & Tags - Only when editing */}
+          {isEditing && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col gap-4 shadow-xl">
+              <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm border-b border-zinc-800 pb-3">
+                <Tag className="w-4 h-4" />
+                <span>3. Informações do Produto & Exibição</span>
+              </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Título / Nome do Produto *
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ex: Fone Bluetooth ANC Cancelamento de Ruído"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Descrição Curta
-              </label>
-              <textarea
-                rows={2}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descrição atrativa em até 2 linhas para o feed..."
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 resize-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Preço</label>
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                  Título / Nome do Produto (Opcional)
+                </label>
                 <input
                   type="text"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="R$ 89,90"
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Ex: Fone Bluetooth ANC Cancelamento de Ruído"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Desconto</label>
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                  Descrição Curta
+                </label>
+                <textarea
+                  rows={2}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Descrição atrativa em até 2 linhas para o feed..."
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Preço</label>
+                  <input
+                    type="text"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="R$ 89,90"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Desconto</label>
+                  <input
+                    type="text"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                    placeholder="-40%"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Posição no Feed</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={position}
+                    onChange={(e) => setPosition(Number(e.target.value))}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                  Tags (separadas por vírgula)
+                </label>
                 <input
                   type="text"
-                  value={discount}
-                  onChange={(e) => setDiscount(e.target.value)}
-                  placeholder="-40%"
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  placeholder="Eletrônicos, Fone, Shopee, Promoção"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Posição no Feed</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={position}
-                  onChange={(e) => setPosition(Number(e.target.value))}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Tags (separadas por vírgula)
-              </label>
-              <input
-                type="text"
-                value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="Eletrônicos, Fone, Shopee, Promoção"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none"
-              />
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/80">
-              <div>
-                <span className="text-xs font-bold text-white block">Status do Vídeo</span>
-                <span className="text-[11px] text-zinc-400">
-                  {active ? 'Ativo (Aparece no feed público)' : 'Inativo (Oculto do feed)'}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActive(!active)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                  active ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-400'
-                }`}
-              >
-                {active ? 'Ativo' : 'Rascunho'}
-              </button>
-            </div>
-
-            {/* Priority Release / Vídeo Fresquinho Mode */}
-            <div className="p-4 rounded-2xl bg-gradient-to-b from-rose-950/20 to-zinc-950 border border-rose-500/30 space-y-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400">
-                    <Flame className="w-4 h-4 fill-rose-400" />
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800/80">
+                <div>
+                  <span className="text-xs font-bold text-white block">Status do Vídeo</span>
+                  <span className="text-[11px] text-zinc-400">
+                    {active ? 'Ativo (Aparece no feed público)' : 'Inativo (Oculto do feed)'}
                   </span>
-                  <div>
-                    <span className="text-xs font-bold text-white block">
-                      🔥 Modo Vídeo Fresquinho (Acesso Prioritário)
-                    </span>
-                    <span className="text-[11px] text-zinc-400">
-                      Disponibilizar primeiro para usuários com acesso prioritário ativo.
-                    </span>
-                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setPriorityRelease(!priorityRelease)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                    priorityRelease
-                      ? 'bg-gradient-to-r from-rose-600 to-amber-500 text-white shadow-md shadow-rose-950/50'
-                      : 'bg-zinc-800 text-zinc-400'
+                  onClick={() => setActive(!active)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
+                    active ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-400'
                   }`}
                 >
-                  {priorityRelease ? 'Ativado' : 'Desativado'}
+                  {active ? 'Ativo' : 'Rascunho'}
                 </button>
               </div>
 
-              {priorityRelease && (
-                <div className="pt-2 border-t border-rose-500/20 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-1.5 text-xs text-zinc-300">
-                    <Clock className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Duração da exclusividade:</span>
-                  </div>
+              {/* Priority Release / Vídeo Fresquinho Mode */}
+              <div className="p-4 rounded-2xl bg-gradient-to-b from-rose-950/20 to-zinc-950 border border-rose-500/30 space-y-3">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <select
-                      value={priorityDurationHours}
-                      onChange={(e) => setPriorityDurationHours(Number(e.target.value))}
-                      className="bg-zinc-900 border border-zinc-700 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none"
-                    >
-                      <option value={6}>6 horas</option>
-                      <option value={12}>12 horas</option>
-                      <option value={24}>24 horas (Recomendado)</option>
-                      <option value={48}>48 horas</option>
-                    </select>
+                    <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400">
+                      <Flame className="w-4 h-4 fill-rose-400" />
+                    </span>
+                    <div>
+                      <span className="text-xs font-bold text-white block">
+                        🔥 Modo Vídeo Fresquinho (Acesso Prioritário)
+                      </span>
+                      <span className="text-[11px] text-zinc-400">
+                        Disponibilizar primeiro para usuários com acesso prioritário ativo.
+                      </span>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setPriorityRelease(!priorityRelease)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      priorityRelease
+                        ? 'bg-gradient-to-r from-rose-600 to-amber-500 text-white shadow-md shadow-rose-950/50'
+                        : 'bg-zinc-800 text-zinc-400'
+                    }`}
+                  >
+                    {priorityRelease ? 'Ativado' : 'Desativado'}
+                  </button>
                 </div>
-              )}
+
+                {priorityRelease && (
+                  <div className="pt-2 border-t border-rose-500/20 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-300">
+                      <Clock className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Duração da exclusividade:</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={priorityDurationHours}
+                        onChange={(e) => setPriorityDurationHours(Number(e.target.value))}
+                        className="bg-zinc-900 border border-zinc-700 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none"
+                      >
+                        <option value={6}>6 horas</option>
+                        <option value={12}>12 horas</option>
+                        <option value={24}>24 horas (Recomendado)</option>
+                        <option value={48}>48 horas</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right Column: Live Mobile Preview (5 cols) */}
@@ -527,25 +513,31 @@ export const VideoForm: React.FC<VideoFormProps> = ({
                   </div>
                 )}
 
-                <div>
-                  <h4 className="font-bold text-sm text-white line-clamp-2 leading-snug">
-                    {title || 'Título do produto de exemplo'}
-                  </h4>
-                  {price && (
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-emerald-400 font-extrabold text-xs">{price}</span>
-                      {discount && (
-                        <span className="text-[10px] bg-rose-600 px-1 py-0.2 rounded text-white font-bold">
-                          {discount}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
+                {(title || price) && (
+                  <div>
+                    {title && (
+                      <h4 className="font-bold text-sm text-white line-clamp-2 leading-snug">
+                        {title}
+                      </h4>
+                    )}
+                    {price && (
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-emerald-400 font-extrabold text-xs">{price}</span>
+                        {discount && (
+                          <span className="text-[10px] bg-rose-600 px-1 py-0.2 rounded text-white font-bold">
+                            {discount}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                <p className="text-[11px] text-zinc-300 line-clamp-2 leading-tight">
-                  {description || 'Descrição curta do produto como aparecerá no feed de vídeos.'}
-                </p>
+                {description && (
+                  <p className="text-[11px] text-zinc-300 line-clamp-2 leading-tight">
+                    {description}
+                  </p>
+                )}
 
                 <div className="flex items-center gap-2 pt-1">
                   <div className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
