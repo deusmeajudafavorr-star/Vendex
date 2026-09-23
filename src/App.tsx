@@ -6,7 +6,6 @@ import { AdminLogin } from './components/AdminLogin.tsx';
 import { AdminDashboard } from './components/AdminDashboard.tsx';
 import { VideoForm } from './components/VideoForm.tsx';
 import { ImportBatch } from './components/ImportBatch.tsx';
-import { getStoredUser, clearGoogleAuth, GoogleAuthUser } from './lib/googleAuth.ts';
 import { VideoItem } from './types.ts';
 
 export default function App() {
@@ -26,8 +25,14 @@ export default function App() {
     return getCurrentRoute();
   });
 
-  const [adminUser, setAdminUser] = useState<GoogleAuthUser | null>(() => {
-    return getStoredUser();
+  const [adminUser, setAdminUser] = useState<any>(() => {
+    try {
+      const stored = localStorage.getItem('vendex_admin_user');
+      if (stored) return JSON.parse(stored);
+    } catch {
+      // ignore
+    }
+    return null;
   });
 
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
@@ -133,7 +138,7 @@ export default function App() {
         onNavigate={navigate}
         onSelectEditVideo={(video) => setEditingVideo(video)}
         onLogout={() => {
-          clearGoogleAuth();
+          localStorage.removeItem('vendex_admin_user');
           setAdminUser(null);
           navigate('/');
         }}

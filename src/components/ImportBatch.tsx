@@ -153,7 +153,7 @@ https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlaze
             <h2>Importar dezenas ou centenas de vídeos para o VendeX</h2>
           </div>
           <p className="text-xs text-zinc-400 leading-relaxed">
-            O importador verifica duplicidade de URL de vídeo, valida os links, gera IDs automáticos, cria backup prévio e atualiza o banco de dados oficial no Google Drive.
+            O importador verifica duplicidade de URL de vídeo, valida os links, gera IDs automáticos, cria backup prévio e atualiza o banco de dados oficial no Firebase Realtime Database.
           </p>
 
           <div className="flex flex-wrap items-center gap-2 pt-2">

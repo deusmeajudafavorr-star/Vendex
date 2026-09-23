@@ -93,7 +93,7 @@ export const Feed: React.FC<FeedProps> = ({ onNavigate }) => {
         if (data.tags) {
           setAvailableTags(data.tags);
         }
-        setSourceInfo(data.source === 'drive' ? 'Google Drive Oficial' : 'Base VendeX');
+        setSourceInfo(data.source === 'firebase' ? 'Firebase RTDB' : 'Base VendeX');
       } catch (err) {
         console.error('Failed to load feed:', err);
       } finally {

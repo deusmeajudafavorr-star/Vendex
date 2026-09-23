@@ -38,7 +38,6 @@ import {
   fetchPriorityMetrics,
   updatePrioritySettings
 } from '../lib/api.ts';
-import { clearGoogleAuth } from '../lib/googleAuth.ts';
 
 interface AdminDashboardProps {
   user: any;
@@ -64,8 +63,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     ctr: '0.0%',
   });
   const [settings, setSettings] = useState<any>({});
-  const [source, setSource] = useState<string>('local');
-  const [driveFileId, setDriveFileId] = useState<string | null>(null);
+  const [source, setSource] = useState<string>('firebase');
 
   // Priority metrics & settings
   const [priorityData, setPriorityData] = useState<any>(null);
@@ -105,8 +103,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setVideos(data.videos || []);
       setStats(data.stats || {});
       setSettings(data.settings || {});
-      setSource(data.source || 'local');
-      if (data.driveFileId) setDriveFileId(data.driveFileId);
+      setSource(data.source || 'firebase');
       await loadPriorityData();
     } catch (err: any) {
       console.error('Failed to load admin videos:', err);
@@ -194,14 +191,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <span className="text-[10px] text-zinc-400 font-medium">
                 {user.email || 'Admin'}
               </span>
-              <span
-                className={`text-[9px] px-2 py-0.2 rounded-full font-bold uppercase tracking-wider ${
-                  source === 'drive'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                }`}
-              >
-                {source === 'drive' ? 'Google Drive Ativo' : 'Armazenamento Local'}
+              <span className="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Firebase RTDB Ativo</span>
               </span>
             </div>
           </div>
@@ -227,7 +219,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => {
-              clearGoogleAuth();
               onLogout();
             }}
             className="p-2 rounded-xl bg-zinc-900 hover:bg-rose-950/50 hover:text-rose-400 text-zinc-400 border border-zinc-800 transition-colors"
@@ -536,7 +527,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     className="w-full py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-extrabold text-xs shadow-lg shadow-rose-950/50 flex items-center justify-center gap-2 active:scale-98 transition-all disabled:opacity-50"
                   >
                     <Sliders className="w-4 h-4" />
-                    <span>{savingPriority ? 'Salvando no Google Drive...' : 'Salvar Configurações no Drive'}</span>
+                    <span>{savingPriority ? 'Salvando no Firebase...' : 'Salvar Configurações no Firebase'}</span>
                   </button>
                 </form>
               </div>
@@ -602,8 +593,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <span className="text-sm font-extrabold text-white mt-1 truncate">
               v{settings.version || 1}
             </span>
-            <span className="text-[10px] text-zinc-400 mt-0.5 truncate">
-              {source === 'drive' ? 'Drive VendeX/database.json' : 'Armazenado local'}
+            <span className="text-[10px] text-zinc-400 mt-0.5 truncate font-mono">
+              Firebase RTDB Cloud
             </span>
           </div>
         </div>

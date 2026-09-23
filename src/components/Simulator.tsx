@@ -212,9 +212,9 @@ export const Simulator: React.FC<SimulatorProps> = ({ onNavigate }) => {
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
             <CheckCircle className="w-5 h-5" />
           </div>
-          <h3 className="font-bold text-sm text-white">Google Drive Oficial</h3>
+          <h3 className="font-bold text-sm text-white">Firebase Realtime Database</h3>
           <p className="text-xs text-zinc-400 leading-relaxed">
-            Seus vídeos, métricas e catálogo guardados com total soberania dentro da sua pasta no Google Drive.
+            Seus vídeos, métricas e catálogo sincronizados em tempo real com alta performance no Firebase.
           </p>
         </div>
       </div>

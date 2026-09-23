@@ -1,5 +1,6 @@
 {
   "projectId": "project-3c915cd8-d39f-4632-93e",
+  "databaseURL": "https://project-3c915cd8-d39f-4632-93e-default-rtdb.firebaseio.com",
   "appId": "1:983394911308:web:8e24f67afb37485d2be0e9",
   "apiKey": "AIzaSyDQxP8BeJ6kAVjMqS2suxw5gI5gCTUv5BI",
   "authDomain": "project-3c915cd8-d39f-4632-93e.firebaseapp.com",
