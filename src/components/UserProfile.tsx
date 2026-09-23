@@ -6,13 +6,8 @@ import {
   Copy,
   Check,
   Sparkles,
-  Clock,
-  Eye,
-  TrendingUp,
   Award,
-  ExternalLink,
-  ChevronRight,
-  Shield
+  Eye
 } from 'lucide-react';
 import { UserPriorityProfile, VideoItem } from '../types.ts';
 import {
@@ -126,7 +121,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           <span>Meu Perfil</span>
           <Flame className="w-4 h-4 text-rose-500 fill-rose-500" />
         </h1>
-        <div className="w-16" /> {/* spacer */}
+        <div className="w-16" />
       </header>
 
       <main className="w-full max-w-md px-4 py-5 space-y-4">
@@ -161,7 +156,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             </div>
           </div>
 
-          {/* Priority Status Card */}
           <div className="mt-4 p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800">
             {isPriority ? (
               <div>
@@ -210,7 +204,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               : 'Compartilhe o link de uma oferta nas redes sociais e desbloqueie seu acesso.'}
           </p>
 
-          {/* Progress Bar */}
           <div className="mt-3 w-full h-2.5 rounded-full bg-zinc-950 border border-zinc-800 overflow-hidden">
             <div
               className={`h-full transition-all duration-500 rounded-full ${
@@ -221,7 +214,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             />
           </div>
 
-          {/* Streak badge */}
           <div className="mt-3 p-3 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <Award className="w-4 h-4 text-amber-400" />
@@ -320,19 +312,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             ))}
           </div>
         </div>
-
-        {/* Admin Access Footer */}
-        {onNavigate && (
-          <div className="pt-4 border-t border-zinc-900 flex justify-center pb-6">
-            <button
-              onClick={() => onNavigate('/admin')}
-              className="px-4 py-2 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium border border-zinc-800 flex items-center gap-2 transition-all active:scale-95"
-            >
-              <Shield className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Acessar Painel de Administração</span>
-            </button>
-          </div>
-        )}
       </main>
     </div>
   );
