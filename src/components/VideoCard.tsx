@@ -390,11 +390,13 @@ export const VideoCard: React.FC<VideoCardProps> = ({
             className="group flex flex-col items-center gap-1 focus:outline-none transition-transform active:scale-90"
             title="Baixar vídeo MP4 do produto"
           >
-            <div className="w-12 h-12 rounded-full bg-zinc-900/60 hover:bg-zinc-800/80 backdrop-blur-md flex items-center justify-center text-white">
-              <Download className="w-5 h-5 stroke-[2]" />
+            <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 via-green-500 to-emerald-700 hover:from-emerald-300 hover:via-green-400 hover:to-emerald-600 backdrop-blur-md flex items-center justify-center text-white shadow-lg shadow-emerald-900/60 ring-2 ring-emerald-300/50 animate-pulse">
+              <Download className="w-6 h-6 stroke-[2.5]" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-yellow-300 ring-2 ring-black animate-ping" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-yellow-300 ring-2 ring-black" />
             </div>
-            <span className="text-[11px] font-semibold tracking-wide drop-shadow-md">
-              Baixar
+            <span className="text-[11px] font-black tracking-wide text-emerald-300 drop-shadow-md">
+              BAIXAR
             </span>
           </button>
         )}
