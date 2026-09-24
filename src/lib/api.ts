@@ -14,6 +14,18 @@ import {
 /**
  * Fetch videos for the user Feed (direct from Firebase RTDB)
  */
+const GITHUB_DATABASE_URL =
+  'https://raw.githubusercontent.com/deusmeajudafavorr-star/Vendex/main/project-3c915cd8-d39f-4632-93e-default-rtdb-export.json';
+
+/**
+ * Fetch videos for the user Feed directly from the JSON stored in GitHub.
+ *
+ * The exported Firebase database has this shape:
+ * { vendex: { videos: [...], priority_settings: {...}, settings: {...} } }
+ *
+ * Firebase is intentionally NOT used here. Analytics/admin writes can continue
+ * using the existing Firebase API while the public catalog is read from GitHub.
+ */
 export async function fetchFeedVideos(
   page = 1,
   limit = 5,
@@ -22,41 +34,100 @@ export async function fetchFeedVideos(
   isPriority = false
 ) {
   try {
-    // Try backend proxy if available, otherwise direct Firebase RTDB
-    const { videos } = await getVideos('active', search, isPriority);
+    const response = await fetch(GITHUB_DATABASE_URL, {
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
 
-    let filtered = videos;
-    if (tag && tag !== 'Todos' && tag !== 'Tudo') {
-      filtered = filtered.filter((v) =>
-        v.tags?.some((t) => t.toLowerCase() === tag.toLowerCase())
+    if (!response.ok) {
+      throw new Error(`GitHub JSON HTTP ${response.status}`);
+    }
+
+    const exportedDatabase = await response.json();
+    const vendexData = exportedDatabase?.vendex || {};
+
+    let videos: VideoItem[] = Array.isArray(vendexData.videos)
+      ? vendexData.videos
+      : [];
+
+    // Public feed: active videos only.
+    videos = videos.filter((v: VideoItem) => v.active === true);
+
+    const normalizedTag = tag?.trim().toLowerCase();
+    const normalizedSearch = search?.trim().toLowerCase();
+
+    if (normalizedTag && normalizedTag !== 'todos' && normalizedTag !== 'tudo') {
+      videos = videos.filter((v: VideoItem) =>
+        v.tags?.some((t) => t.toLowerCase() === normalizedTag) ||
+        v.title.toLowerCase().includes(normalizedTag) ||
+        v.description.toLowerCase().includes(normalizedTag)
       );
     }
 
-    const startIndex = (page - 1) * limit;
-    const paginatedVideos = filtered.slice(startIndex, startIndex + limit);
-    const totalPages = Math.ceil(filtered.length / limit) || 1;
+    if (normalizedSearch) {
+      videos = videos.filter((v: VideoItem) =>
+        v.title.toLowerCase().includes(normalizedSearch) ||
+        v.description.toLowerCase().includes(normalizedSearch) ||
+        v.tags?.some((t) => t.toLowerCase().includes(normalizedSearch))
+      );
+    }
 
-    // Extract all distinct tags from all active videos
+    // Same ordering used by the existing backend.
+    videos.sort(
+      (a: VideoItem, b: VideoItem) =>
+        (a.position || 0) - (b.position || 0) ||
+        new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime()
+    );
+
+    // Preserve the priority-release behavior from the existing feed.
+    const now = Date.now();
+    videos = videos.map((video: VideoItem) => {
+      const priorityRelease = video.priority_release === true;
+      const expiresAt = video.priority_expires_at
+        ? new Date(video.priority_expires_at).getTime()
+        : 0;
+      const stillPriority = priorityRelease && expiresAt > now;
+
+      return {
+        ...video,
+        priority_release: stillPriority,
+        is_locked_priority: stillPriority && !isPriority,
+      };
+    });
+
     const allTags = Array.from(
-      new Set(videos.flatMap((v) => v.tags || []))
+      new Set(
+        (vendexData.videos || [])
+          .filter((v: VideoItem) => v.active)
+          .flatMap((v: VideoItem) => v.tags || [])
+      )
     ).filter(Boolean);
+
+    const startIndex = (page - 1) * limit;
+    const paginatedVideos = videos.slice(startIndex, startIndex + limit);
+    const totalPages = Math.ceil(videos.length / limit) || 1;
 
     return {
       videos: paginatedVideos,
       page,
       totalPages,
-      totalVideos: filtered.length,
+      totalVideos: videos.length,
       pagination: {
         page,
         limit,
-        total: filtered.length,
-        hasMore: startIndex + limit < filtered.length,
+        total: videos.length,
+        hasMore: startIndex + limit < videos.length,
       },
       tags: allTags,
-      source: 'firebase',
+      source: 'github-json',
+      version: vendexData.settings?.version || 1,
+      priority_settings: vendexData.priority_settings,
     };
   } catch (err) {
-    console.error('Failed to fetch feed videos from Firebase:', err);
+    console.error('Failed to fetch feed videos from GitHub JSON:', err);
     throw err;
   }
 }
