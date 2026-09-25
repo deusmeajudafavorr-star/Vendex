@@ -2,7 +2,7 @@
   "routes": [
     {
       "src": "^/r/(.*)$",
-      "dest": "/api/r/$1"
+      "dest": "/api/r?u=$1"
     },
     {
       "handle": "filesystem"
