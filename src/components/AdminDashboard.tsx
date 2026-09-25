@@ -36,7 +36,8 @@ import {
   deleteAdminVideo,
   clearBackendCache,
   fetchPriorityMetrics,
-  updatePrioritySettings
+  updatePrioritySettings,
+  importRedirectLinks
 } from '../lib/api.ts';
 
 interface AdminDashboardProps {
@@ -83,6 +84,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [importingRedirects, setImportingRedirects] = useState(false);
 
   const loadPriorityData = async () => {
     try {
@@ -148,6 +150,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       alert(err.message || 'Erro ao remover');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleImportRedirects = async () => {
+    if (!window.confirm('Importar agora os vídeos redirecionados do VendeX? Os já cadastrados serão ignorados.')) return;
+    setImportingRedirects(true);
+    try {
+      const result = await importRedirectLinks(settings.version);
+      setFeedback('Importação concluída: ' + result.importedCount + ' vídeos importados e ' + result.skippedCount + ' já existentes.');
+      await loadData();
+    } catch (err: any) {
+      alert(err?.message || 'Erro ao importar vídeos redirecionados');
+    } finally {
+      setImportingRedirects(false);
     }
   };
 
@@ -617,6 +633,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               <Upload className="w-4 h-4 text-amber-400" />
               <span>Importar Lote (CSV/JSON)</span>
+            </button>
+
+            <button
+              onClick={handleImportRedirects}
+              disabled={importingRedirects}
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 hover:from-violet-500 hover:to-fuchsia-400 text-white text-xs font-bold border border-violet-400/30 flex items-center gap-2 shadow-lg shadow-violet-950/40 disabled:opacity-50 transition-all"
+              title="Importa os vídeos do redirect-links.json diretamente para o catálogo"
+            >
+              <FolderSync className="w-4 h-4" />
+              <span>{importingRedirects ? 'Importando...' : 'Importar Redirects VendeX'}</span>
             </button>
           </div>
 
