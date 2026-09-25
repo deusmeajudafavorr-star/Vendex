@@ -317,7 +317,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       let binary = '';
                       bytes.forEach((b) => { binary += String.fromCharCode(b); });
                       const token = btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-                      return ['https://vendex-one.vercel.app/api/r/', token].join('');
+                      return ['https://vendex-one.vercel.app/api/r?u=', encodeURIComponent(token)].join('');
                     } catch { return null; }
                   }).filter(Boolean) as string[];
                   setRedirectOutput(result.join('\n'));
