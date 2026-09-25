@@ -53,7 +53,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSelectEditVideo,
   onLogout,
 }) => {
-  const [activeTab, setActiveTab] = useState<'videos' | 'priority'>('videos');
+  const [activeTab, setActiveTab] = useState<'videos' | 'priority' | 'redirects'>('videos');
+  const [redirectInput, setRedirectInput] = useState('');
+  const [redirectOutput, setRedirectOutput] = useState('');
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [stats, setStats] = useState<any>({
     totalVideos: 0,
@@ -290,9 +292,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </span>
             )}
           </button>
+
+          <button onClick={() => setActiveTab('redirects')} className="px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all text-zinc-400 hover:text-white hover:bg-zinc-900/60">
+            <ExternalLink className="w-4 h-4 text-cyan-400" />
+            <span>Gerar Links Redirect</span>
+          </button>
         </div>
 
-        {activeTab === 'priority' ? (
+
+        {activeTab === 'redirects' ? (
+          <div className="space-y-5 animate-fade-in">
+            <div className="bg-zinc-900 border border-cyan-500/20 rounded-3xl p-5 sm:p-6">
+              <h2 className="text-base font-extrabold text-white">Gerador de Links Redirect VendeX</h2>
+              <p className="text-xs text-zinc-400 mt-1 mb-5">Cole vários links, um por linha. Eles serão transformados em links VendeX sem cadastrar ou publicar os vídeos no catálogo.</p>
+              <textarea value={redirectInput} onChange={(e) => setRedirectInput(e.target.value)} placeholder="https://exemplo.com/video1.mp4&#10;https://exemplo.com/video2.mp4" className="w-full min-h-44 bg-zinc-950 border border-zinc-800 focus:border-cyan-500 rounded-2xl p-4 text-xs text-white placeholder-zinc-600 outline-none resize-y font-mono" />
+              <div className="flex flex-wrap gap-2 mt-4">
+                <button onClick={() => {
+                  const lines = redirectInput.split(/\r?\n/).map((v) => v.trim()).filter(Boolean);
+                  const result = lines.map((url) => {
+                    try {
+                      const parsed = new URL(url);
+                      if (!/^https?:$/.test(parsed.protocol)) return null;
+                      const bytes = new TextEncoder().encode(url);
+                      let binary = '';
+                      bytes.forEach((b) => { binary += String.fromCharCode(b); });
+                      const token = btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                      return ['https://vendex-one.vercel.app/r/', token].join('');
+                    } catch { return null; }
+                  }).filter(Boolean) as string[];
+                  setRedirectOutput(result.join('\n'));
+                  setFeedback(result.length + ' link(s) redirect gerado(s).');
+                }} disabled={!redirectInput.trim()} className="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 disabled:opacity-40 text-white text-xs font-extrabold">Transformar Links</button>
+                <button onClick={() => { setRedirectInput(''); setRedirectOutput(''); }} className="px-5 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold">Limpar</button>
+                {redirectOutput && <button onClick={async () => { await navigator.clipboard.writeText(redirectOutput); setFeedback('Todos os links redirect foram copiados.'); }} className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold">Copiar Todos</button>}
+              </div>
+              {redirectOutput && <textarea value={redirectOutput} readOnly className="w-full min-h-56 mt-5 bg-zinc-950 border border-emerald-500/20 rounded-2xl p-4 text-[11px] text-emerald-300 font-mono outline-none" />}
+            </div>
+          </div>
+        ) : activeTab === 'priority' ? (
           /* =======================================
              TAB: VÍDEO FRESQUINHO & PRIORIDADE
              ======================================= */
