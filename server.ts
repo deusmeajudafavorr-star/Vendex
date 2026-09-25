@@ -818,7 +818,7 @@ app.post('/api/admin/priority/settings', async (req, res) => {
 app.get('/media/:filename', async (req, res) => {
   try {
     const filename = req.params.filename;
-    if (!/^[A-Za-z0-9._-]+\\.mp4$/i.test(filename)) {
+    if (!/^[A-Za-z0-9._-]+\.mp4$/i.test(filename)) {
       return res.status(400).send('Arquivo de video invalido');
     }
 
@@ -829,7 +829,7 @@ app.get('/media/:filename', async (req, res) => {
     const mediaMap = JSON.parse(raw);
     const sourceUrl = mediaMap?.links?.[filename];
 
-    if (!sourceUrl || !/^https:\\/\\//i.test(sourceUrl)) {
+    if (!sourceUrl || !/^https:\/\//i.test(sourceUrl)) {
       return res.status(404).send('Video nao encontrado');
     }
 
@@ -885,7 +885,7 @@ app.head('/media/:filename', async (req, res) => {
   // the GET handler already performs a real upstream HEAD when method=HEAD.
   try {
     const filename = req.params.filename;
-    if (!/^[A-Za-z0-9._-]+\\.mp4$/i.test(filename)) {
+    if (!/^[A-Za-z0-9._-]+\.mp4$/i.test(filename)) {
       return res.status(400).send('Arquivo de video invalido');
     }
     const path = await import('node:path');
@@ -893,7 +893,7 @@ app.head('/media/:filename', async (req, res) => {
     const raw = await fs.readFile(path.resolve(process.cwd(), 'media-links.json'), 'utf8');
     const mediaMap = JSON.parse(raw);
     const sourceUrl = mediaMap?.links?.[filename];
-    if (!sourceUrl || !/^https:\\/\\//i.test(sourceUrl)) return res.status(404).end();
+    if (!sourceUrl || !/^https:\/\//i.test(sourceUrl)) return res.status(404).end();
 
     const upstream = await fetch(sourceUrl, {
       method: 'HEAD',
