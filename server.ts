@@ -40,6 +40,31 @@ function ensureDatabaseDefaults(data: any): void {
 }
 
 // 1. GET /api/videos - Feed pagination, active only, search by tag, query, ordering, priority checks
+
+// Redirect links: /r/<id> always passes through VendeX before opening the original video.
+app.get('/r/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!/^[A-Za-z0-9-]+$/.test(id)) return res.status(400).send('Link invalido');
+
+    const path = await import('node:path');
+    const fs = await import('node:fs/promises');
+    const mapPath = path.resolve(process.cwd(), 'redirect-links.json');
+    const raw = await fs.readFile(mapPath, 'utf8');
+    const data = JSON.parse(raw);
+    const target = data?.links?.[id]?.target;
+
+    if (!target || !/^https:\/\//i.test(target)) {
+      return res.status(404).send('Link nao encontrado');
+    }
+
+    return res.redirect(302, target);
+  } catch (err: any) {
+    console.error('[REDIRECT] Error:', err);
+    return res.status(500).send('Erro ao redirecionar');
+  }
+});
+
 app.get('/api/videos', async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
