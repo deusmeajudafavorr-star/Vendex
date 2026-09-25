@@ -761,6 +761,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {video.description || 'Sem descrição'}
                           </div>
                           <div className="flex items-center gap-3 mt-1 text-[11px]">
+                            {video.video_url && (
+                              <a
+                                href={video.video_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-violet-400 hover:text-violet-300 hover:underline flex items-center gap-1 font-semibold"
+                              >
+                                <span>Ver Vídeo</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                            {video.download_url && video.download_url !== video.video_url && (
+                              <a
+                                href={video.download_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-1"
+                              >
+                                <span>Download</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
                             {video.affiliate_url && (
                               <a
                                 href={video.affiliate_url}
