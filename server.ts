@@ -1,3 +1,4 @@
+import { Readable } from 'node:stream';
 import express from 'express';
 import {
   getDriveDatabase,
@@ -811,7 +812,109 @@ app.post('/api/admin/priority/settings', async (req, res) => {
   }
 });
 
-// Vite middleware mounting in development or static serving in production
+// Public video proxy: exposes stable VendeX /media/<filename>.mp4 URLs
+// while forwarding the request to the current public source URL stored in media-links.json.
+// Range/HEAD support is preserved so browsers and Pinterest can validate/stream the MP4.
+app.get('/media/:filename', async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    if (!/^[A-Za-z0-9._-]+\\.mp4$/i.test(filename)) {
+      return res.status(400).send('Arquivo de video invalido');
+    }
+
+    const path = await import('node:path');
+    const fs = await import('node:fs/promises');
+    const mapPath = path.resolve(process.cwd(), 'media-links.json');
+    const raw = await fs.readFile(mapPath, 'utf8');
+    const mediaMap = JSON.parse(raw);
+    const sourceUrl = mediaMap?.links?.[filename];
+
+    if (!sourceUrl || !/^https:\\/\\//i.test(sourceUrl)) {
+      return res.status(404).send('Video nao encontrado');
+    }
+
+    const headers: Record<string, string> = {
+      'User-Agent': 'VendeX-Media-Proxy/1.0',
+      'Accept': 'video/mp4,*/*'
+    };
+    const range = req.headers.range;
+    if (range) headers.Range = range;
+
+    const upstream = await fetch(sourceUrl, {
+      method: req.method === 'HEAD' ? 'HEAD' : 'GET',
+      headers,
+      redirect: 'follow'
+    });
+
+    res.status(upstream.status);
+
+    const passthroughHeaders = [
+      'content-type',
+      'content-length',
+      'content-range',
+      'accept-ranges',
+      'etag',
+      'last-modified'
+    ];
+    for (const name of passthroughHeaders) {
+      const value = upstream.headers.get(name);
+      if (value) res.setHeader(name, value);
+    }
+
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Disposition', 'inline');
+
+    if (req.method === 'HEAD' || !upstream.body) {
+      return res.end();
+    }
+
+    Readable.fromWeb(upstream.body as any).pipe(res);
+  } catch (err: any) {
+    console.error('[MEDIA PROXY] Error:', err);
+    if (!res.headersSent) {
+      res.status(502).send('Nao foi possivel acessar o video de origem');
+    } else {
+      res.end();
+    }
+  }
+});
+
+app.head('/media/:filename', async (req, res) => {
+  // Reuse the same proxy logic through a GET-style internal request is avoided;
+  // the GET handler already performs a real upstream HEAD when method=HEAD.
+  try {
+    const filename = req.params.filename;
+    if (!/^[A-Za-z0-9._-]+\\.mp4$/i.test(filename)) {
+      return res.status(400).send('Arquivo de video invalido');
+    }
+    const path = await import('node:path');
+    const fs = await import('node:fs/promises');
+    const raw = await fs.readFile(path.resolve(process.cwd(), 'media-links.json'), 'utf8');
+    const mediaMap = JSON.parse(raw);
+    const sourceUrl = mediaMap?.links?.[filename];
+    if (!sourceUrl || !/^https:\\/\\//i.test(sourceUrl)) return res.status(404).end();
+
+    const upstream = await fetch(sourceUrl, {
+      method: 'HEAD',
+      headers: { 'User-Agent': 'VendeX-Media-Proxy/1.0', 'Accept': 'video/mp4,*/*' },
+      redirect: 'follow'
+    });
+    res.status(upstream.status);
+    for (const name of ['content-type','content-length','content-range','accept-ranges','etag','last-modified']) {
+      const value = upstream.headers.get(name);
+      if (value) res.setHeader(name, value);
+    }
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Disposition', 'inline');
+    res.end();
+  } catch {
+    res.status(502).end();
+  }
+});
+
+// // Vite middleware mounting in development or static serving in production
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
