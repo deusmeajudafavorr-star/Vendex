@@ -295,7 +295,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button onClick={() => setActiveTab('redirects')} className="px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all text-zinc-400 hover:text-white hover:bg-zinc-900/60">
             <ExternalLink className="w-4 h-4 text-cyan-400" />
-            <span>Gerar Links Redirect</span>
+            <span>Gerar Links Redirect MP4</span>
           </button>
         </div>
 
@@ -317,14 +317,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       let binary = '';
                       bytes.forEach((b) => { binary += String.fromCharCode(b); });
                       const token = btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-                      return ['https://vendex-one.vercel.app/r/', token].join('');
+                      return ['https://vendex-one.vercel.app/api/r/', token].join('');
                     } catch { return null; }
                   }).filter(Boolean) as string[];
                   setRedirectOutput(result.join('\n'));
-                  setFeedback(result.length + ' link(s) redirect gerado(s).');
+                  setFeedback(result.length + ' link(s) de vídeo cru gerado(s).');
                 }} disabled={!redirectInput.trim()} className="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 disabled:opacity-40 text-white text-xs font-extrabold">Transformar Links</button>
                 <button onClick={() => { setRedirectInput(''); setRedirectOutput(''); }} className="px-5 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold">Limpar</button>
-                {redirectOutput && <button onClick={async () => { await navigator.clipboard.writeText(redirectOutput); setFeedback('Todos os links redirect foram copiados.'); }} className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold">Copiar Todos</button>}
+                {redirectOutput && <button onClick={async () => { await navigator.clipboard.writeText(redirectOutput); setFeedback('Todos os links de vídeo cru foram copiados.'); }} className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold">Copiar Todos</button>}
               </div>
               {redirectOutput && <textarea value={redirectOutput} readOnly className="w-full min-h-56 mt-5 bg-zinc-950 border border-emerald-500/20 rounded-2xl p-4 text-[11px] text-emerald-300 font-mono outline-none" />}
             </div>
