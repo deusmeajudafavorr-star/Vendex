@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -14,7 +13,7 @@ function decodeTarget(id: string): string | null {
   return null;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   const id = String(req.query.id || '');
 
   if (!/^[A-Za-z0-9_-]+$/.test(id)) {
