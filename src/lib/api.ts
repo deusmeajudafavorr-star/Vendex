@@ -194,6 +194,17 @@ export async function importBatchVideos(items: any[], expectedVersion?: number) 
 /**
  * Sync and reload latest data from Firebase Realtime Database
  */
+export async function importRedirectLinks(expectedVersion?: number) {
+  const res = await fetch('/api/admin/import-redirect-links', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expectedVersion }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || data.details || 'Erro ao importar links redirecionados');
+  return data;
+}
+
 export async function clearBackendCache() {
   const data = await getFirebaseData();
   return { success: true, version: data.settings.version };
