@@ -52,9 +52,22 @@ app.get('/r/:id', async (req, res) => {
     const mapPath = path.resolve(process.cwd(), 'redirect-links.json');
     const raw = await fs.readFile(mapPath, 'utf8');
     const data = JSON.parse(raw);
-    const target = data?.links?.[id]?.target;
+    let target = data?.links?.[id]?.target;
 
-    if (!target || !/^https:\/\//i.test(target)) {
+    // Redirects gerados diretamente pelo painel: o destino fica codificado no próprio link,
+    // então não é necessário cadastrar/publicar o vídeo no catálogo.
+    if (!target) {
+      try {
+        const normalized = id.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = normalized + '='.repeat((4 - (normalized.length % 4)) % 4);
+        const decoded = Buffer.from(padded, 'base64').toString('utf8');
+        if (/^https?:\/\//i.test(decoded)) target = decoded;
+      } catch {
+        // mantém 404 abaixo
+      }
+    }
+
+    if (!target || !/^https?:\/\//i.test(target)) {
       return res.status(404).send('Link nao encontrado');
     }
 
