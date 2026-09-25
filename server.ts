@@ -482,6 +482,67 @@ app.post('/api/admin/import', async (req, res) => {
   }
 });
 
+// 8b. POST /api/admin/import-redirect-links - Import all redirect videos generated for VendeX
+app.post('/api/admin/import-redirect-links', async (req, res) => {
+  try {
+    const token = getBearerToken(req);
+    const { expectedVersion } = req.body || {};
+    const path = await import('node:path');
+    const fs = await import('node:fs/promises');
+    const mapPath = path.resolve(process.cwd(), 'redirect-links.json');
+    const raw = await fs.readFile(mapPath, 'utf8');
+    const map = JSON.parse(raw);
+    const links = map?.links || {};
+
+    const { data } = await getDriveDatabase(token);
+    const existingUrls = new Set(data.videos.map((v: VideoItem) => (v.video_url || '').toLowerCase().trim()));
+    const imported: VideoItem[] = [];
+    const skipped: any[] = [];
+
+    for (const [id, entry] of Object.entries(links) as Array<[string, any]>) {
+      const videoUrl = `https://vendex-one.vercel.app/r/${id}`;
+      if (existingUrls.has(videoUrl.toLowerCase())) {
+        skipped.push({ id, reason: 'Vídeo já cadastrado' });
+        continue;
+      }
+      existingUrls.add(videoUrl.toLowerCase());
+      const fileName = String(id).replace(/[^A-Za-z0-9_-]/g, '');
+      const now = new Date().toISOString();
+      imported.push({
+        id: `video_redirect_${id}`,
+        video_url: videoUrl,
+        download_url: videoUrl,
+        product_url: '',
+        affiliate_url: '',
+        title: `Vídeo importado ${fileName}`,
+        description: 'Vídeo importado em massa através do redirecionamento VendeX.',
+        thumbnail_url: '',
+        allow_download: true,
+        active: true,
+        position: data.videos.length + imported.length + 1,
+        tags: ['Importado', 'Redirect', 'VendeX'],
+        views: 0,
+        clicks: 0,
+        downloads: 0,
+        shares: 0,
+        created_at: now,
+        updated_at: now,
+      });
+    }
+
+    if (imported.length > 0) {
+      data.videos.push(...imported);
+      const saveResult = await saveDriveDatabase(data, token, expectedVersion);
+      if (!saveResult.success) return res.status(409).json(saveResult);
+    }
+
+    res.json({ success: true, importedCount: imported.length, skippedCount: skipped.length, totalRedirectLinks: Object.keys(links).length, skipped });
+  } catch (err: any) {
+    console.error('[API POST /api/admin/import-redirect-links] Error:', err);
+    res.status(500).json({ error: 'Erro ao importar vídeos redirecionados', details: err?.message });
+  }
+});
+
 // 9. POST /api/admin/cache/clear - Invalidate cache manually
 app.post('/api/admin/cache/clear', (req, res) => {
   invalidateCache();
