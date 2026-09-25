@@ -644,6 +644,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <FolderSync className="w-4 h-4" />
               <span>{importingRedirects ? 'Importando...' : 'Importar Redirects VendeX'}</span>
             </button>
+
+            <button
+              onClick={() => onNavigate('/admin/redirects')}
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-500 hover:from-cyan-500 hover:to-blue-400 text-white text-xs font-bold border border-cyan-400/30 flex items-center gap-2 shadow-lg shadow-blue-950/40 transition-all"
+              title="Transformar links em redirects VendeX sem publicar vídeos"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>Gerar Links Redirect</span>
+            </button>
           </div>
 
           {/* Search and Filters */}
